@@ -1,11 +1,21 @@
 import Ember from 'ember';
 
-var get = Ember.get;
-var set = Ember.set;
+let get = Ember.get;
+let makeArray = Ember.makeArray;
+let set = Ember.set;
 
 export default Ember.Object.extend({
-  unknownProperty: function(property) {
+  unknownProperty(property) {
     set(this, property, Ember.A());
     return get(this, property);
+  },
+
+  add(attribute, messages) {
+    let errors = get(this, attribute);
+    let uniqueMessages = messages.reject(message => {
+      return errors.contains(message);
+    });
+
+    errors.pushObjects(uniqueMessages);
   }
 });

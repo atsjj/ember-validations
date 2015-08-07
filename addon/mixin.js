@@ -1,21 +1,10 @@
 import Ember from 'ember';
 import Errors from 'ember-validations/errors';
 import Base from 'ember-validations/validators/base';
+import ValidityFlag from 'ember-validations/mixins/validity-flag'
 
 var get = Ember.get;
 var set = Ember.set;
-
-var setValidityMixin = Ember.Mixin.create({
-  isValid: Ember.computed('validators.@each.isValid', function() {
-    var compactValidators = get(this, 'validators').compact();
-    var filteredValidators = compactValidators.filter(function(validator) {
-      return !get(validator, 'isValid');
-    });
-
-    return get(filteredValidators, 'length') === 0;
-  }),
-  isInvalid: Ember.computed.not('isValid')
-});
 
 var pushValidatableObject = function(model, property) {
   var content = get(model, property);
@@ -69,7 +58,7 @@ var lookupValidator = function(validatorName) {
   return validators;
 };
 
-var ArrayValidatorProxy = Ember.ArrayProxy.extend(setValidityMixin, {
+var ArrayValidatorProxy = Ember.ArrayProxy.extend(ValidityFlag, {
   validate: function() {
     return this._validate();
   },
@@ -80,7 +69,7 @@ var ArrayValidatorProxy = Ember.ArrayProxy.extend(setValidityMixin, {
   validators: Ember.computed.alias('content')
 });
 
-export default Ember.Mixin.create(setValidityMixin, {
+export default Ember.Mixin.create(ValidityFlag, {
   init: function() {
     this._super();
     this.errors = Errors.create();
