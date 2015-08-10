@@ -80,10 +80,11 @@ var ArrayValidatorProxy = Ember.ArrayProxy.extend(setValidityMixin, {
   validators: Ember.computed.alias('content')
 });
 
-export default Ember.Mixin.create(setValidityMixin, {
+// export default Ember.Mixin.create(setValidityMixin, {
+export default Ember.Mixin.create({
   init: function() {
     this._super();
-    this.errors = Errors.create();
+    // this.errors = Errors.create();
     this.dependentValidationKeys = {};
     this.validators = Ember.A();
     if (get(this, 'validations') === undefined) {
@@ -92,13 +93,14 @@ export default Ember.Mixin.create(setValidityMixin, {
     this.buildValidators();
     this.validators.forEach(function(validator) {
       validator.addObserver('errors.[]', this, function(sender) {
-        var errors = Ember.A();
+        // var errors = Ember.A();
         this.validators.forEach(function(validator) {
           if (validator.property === sender.property) {
-            errors.addObjects(validator.errors);
+            get(this, 'errors').add(sender.property, validators.errors);
+            // errors.addObjects(validator.errors);
           }
         }, this);
-        set(this, 'errors.' + sender.property, errors);
+        // set(this, 'errors.' + sender.property, errors);
       });
     }, this);
   },
@@ -159,7 +161,7 @@ export default Ember.Mixin.create(setValidityMixin, {
       if (vals.indexOf(false) > -1) {
         return Ember.RSVP.reject(errors);
       }
-      return errors;
+      return self;
     });
   },
   _validate: Ember.on('init', function() {
